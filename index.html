@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SAIMED - One Stop Medical Supply</title>
+  <meta name="description" content="SAIMED menyediakan alat kesehatan, instrumen medis, dan perlengkapan praktikum untuk mahasiswa kesehatan, tenaga medis, klinik, dan institusi." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230D7C7B'/%3E%3Cpath d='M20 34h10v10h8V34h10v-8H38V16h-8v10H20z' fill='white'/%3E%3C/svg%3E" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ink: '#081E46',
+            teal: '#0B66D8',
+            green: '#176B3A',
+            mint: '#E5F6EC',
+            steel: '#E8F2FA',
+            navy: '#0B2F6D',
+            cyan: '#18A7C8'
+          },
+          fontFamily: {
+            sans: ['Poppins', 'sans-serif'],
+            body: ['Lato', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: Poppins, sans-serif; color: #081E46; background: #E8F2FA; letter-spacing: 0; }
+    p, input, textarea, select { font-family: Lato, sans-serif; }
+    ::selection { background: #1769E0; color: white; }
+    .glass { background: rgba(255,255,255,.82); backdrop-filter: blur(16px); border: 1px solid rgba(8,30,70,.1); }
+    .mesh {
+      background:
+        radial-gradient(circle at 16% 16%, rgba(11,102,216,.26), transparent 31%),
+        radial-gradient(circle at 84% 12%, rgba(23,107,58,.24), transparent 28%),
+        radial-gradient(circle at 60% 76%, rgba(24,167,200,.16), transparent 32%),
+        linear-gradient(135deg, #DDEBFF 0%, #E5F6EC 54%, #EEF8FF 100%);
+    }
+    .instrument-grid {
+      background-image:
+        linear-gradient(rgba(8,30,70,.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(8,30,70,.055) 1px, transparent 1px);
+      background-size: 34px 34px;
+    }
+    .reveal { opacity: 1; transform: none; transition: transform .25s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+    .category-card:hover .category-icon { transform: translateY(-3px); }
+    .brand-logo { object-fit: contain; }
+    .hero-product-image { object-position: 62% center; }
+    .brand-divider { display: flex; align-items: center; gap: 12px; justify-content: center; }
+    .brand-divider::before,
+    .brand-divider::after { content: ""; height: 4px; width: min(34vw, 330px); background: #0B2F6D; border-radius: 999px; }
+    .brand-divider span { width: 8px; height: 8px; border-radius: 50%; background: #176B3A; box-shadow: 16px 0 #176B3A, -16px 0 #176B3A; }
+    .contact-pill { border: 2px solid rgba(255,255,255,.28); border-radius: 999px; background: rgba(255,255,255,.14); }
+    .brand-card { background: rgba(255,255,255,.76); border: 1px solid rgba(11,102,216,.14); box-shadow: 0 16px 42px rgba(8,30,70,.06); }
+    .icon-badge { display: grid; place-items: center; border-radius: 999px; background: #DDEBFF; color: #0B66D8; box-shadow: 0 10px 24px rgba(11,102,216,.13); }
+    .icon-badge.green { background: #E5F6EC; color: #176B3A; box-shadow: 0 10px 24px rgba(23,107,58,.12); }
+    .saimed-band { background: #0B2F6D; }
+    .category-card { text-align: left; cursor: pointer; }
+    .category-card.active { border-color: rgba(23,107,58,.55); box-shadow: 0 18px 48px rgba(23,107,58,.16); }
+    .category-tab.active { background: #176B3A !important; color: white !important; border-color: #176B3A !important; }
+    .product-card { overflow: hidden; border: 1px solid rgba(11,102,216,.14); background: rgba(255,255,255,.78); }
+    .product-card img { aspect-ratio: 1 / 1; width: 100%; object-fit: contain; background: #F7FAFD; padding: 10px; }
+    .product-card:nth-child(even) .product-rank { background: #176B3A; }
+    .product-card:nth-child(odd) .product-rank { background: #0B66D8; }
+    @media (prefers-reduced-motion: reduce) {
+      .reveal, .category-icon { transition: none; }
+    }
+    @media (max-width: 640px) {
+      .hero-product-image { object-position: 72% 70%; }
+    }
+  </style>
+</head>
+<body>
+  <header class="fixed inset-x-0 top-0 z-50 border-b border-ink/10 bg-white/85 backdrop-blur-xl">
+    <nav class="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
+      <a href="#beranda" class="flex items-center gap-3" aria-label="SAIMED">
+        <img src="assets/saimed-logo-transparent.png" alt="SAIMED Sentra Alkes Indonesia" class="brand-logo h-12 w-28 object-left" />
+      </a>
+      <div class="hidden items-center gap-7 text-sm font-semibold text-ink/70 md:flex">
+        <a href="#produk" class="hover:text-teal">Produk</a>
+        <a href="#solusi" class="hover:text-teal">Solusi</a>
+        <a href="#b2b" class="hover:text-teal">Institusi</a>
+        <a href="#faq" class="hover:text-teal">FAQ</a>
+      </div>
+      <a href="#konsultasi" class="hidden rounded-md bg-teal px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-teal/20 transition hover:bg-green md:inline-flex">Konsultasi</a>
+      <button id="menuButton" class="grid h-10 w-10 place-items-center rounded-md border border-ink/10 md:hidden" aria-label="Buka menu">
+        <iconify-icon icon="lucide:menu" width="22" height="22"></iconify-icon>
+      </button>
+    </nav>
+    <div id="mobileMenu" class="hidden border-t border-ink/10 bg-white px-5 py-4 md:hidden">
+      <div class="grid gap-3 text-sm font-semibold text-ink/75">
+        <a href="#produk">Produk</a>
+        <a href="#solusi">Solusi</a>
+        <a href="#b2b">Institusi</a>
+        <a href="#konsultasi">Konsultasi</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="beranda">
+    <section class="mesh relative overflow-hidden pt-28">
+      <div class="instrument-grid absolute inset-0 opacity-70"></div>
+      <div class="relative mx-auto grid min-h-[86vh] max-w-7xl items-center gap-10 px-5 pb-28 pt-14 lg:grid-cols-[.95fr_1.05fr] lg:px-8">
+        <div class="reveal">
+          <div class="mb-8 hidden items-center gap-3 lg:flex">
+            <img src="assets/saimed-logo-transparent.png" alt="Logo SAIMED" class="brand-logo h-24 w-32 object-left" />
+          </div>
+          <span class="inline-flex items-center gap-2 rounded-full border border-teal/20 bg-white/80 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-teal">
+            <iconify-icon icon="lucide:shield-check" width="16" height="16"></iconify-icon>
+            One Stop Medical Supply
+          </span>
+          <h1 class="mt-6 max-w-4xl text-4xl font-extrabold uppercase leading-[1.02] text-navy sm:text-5xl lg:text-[5.35rem]">
+            Satu tempat <span class="block text-green">untuk alat kesehatan</span>
+          </h1>
+          <div class="brand-divider mt-5 justify-start"><span></span></div>
+          <p class="mt-6 max-w-2xl text-base leading-8 text-ink/70 sm:text-lg">
+            Temukan instrumen medis, alat pemeriksaan, perlengkapan praktikum, dan kebutuhan pengadaan dalam satu tempat yang membantu Anda memilih lebih tepat sejak awal.
+          </p>
+          <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+            <a href="#konsultasi" class="inline-flex items-center justify-center gap-2 rounded-md bg-teal px-5 py-3.5 text-sm font-bold text-white shadow-xl shadow-teal/20 transition hover:bg-green">
+              Konsultasi Produk
+              <iconify-icon icon="lucide:arrow-right" width="18" height="18"></iconify-icon>
+            </a>
+            <a href="#konsultasi" class="inline-flex items-center justify-center gap-2 rounded-md border border-ink/15 bg-white/70 px-5 py-3.5 text-sm font-bold text-ink transition hover:border-teal hover:text-teal">
+              Tanya Kebutuhan
+              <iconify-icon icon="lucide:boxes" width="18" height="18"></iconify-icon>
+            </a>
+          </div>
+        </div>
+
+        <div class="reveal relative">
+          <div class="rounded-lg border border-ink/10 bg-white p-3 shadow-2xl shadow-ink/10">
+            <div class="relative min-h-[520px] overflow-hidden rounded-md bg-steel">
+              <img src="assets/saimed-hero-generated.png" alt="Produk alat kesehatan SAIMED di ruang klinis bersih" class="hero-product-image absolute inset-0 h-full w-full object-cover" />
+              <div class="absolute inset-0 bg-gradient-to-t from-navy/60 via-transparent to-transparent"></div>
+              <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
+                <span class="text-xs font-bold uppercase tracking-[0.2em] text-mint">Kategori Utama</span>
+                <div class="mt-4 grid grid-cols-2 gap-3 text-sm font-semibold">
+                  <span class="rounded-md bg-white/14 px-3 py-2 backdrop-blur">Instrumen bedah</span>
+                  <span class="rounded-md bg-white/14 px-3 py-2 backdrop-blur">Suturing kit</span>
+                  <span class="rounded-md bg-white/14 px-3 py-2 backdrop-blur">Dental tools</span>
+                  <span class="rounded-md bg-white/14 px-3 py-2 backdrop-blur">Disposable</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="glass absolute -left-4 top-10 hidden max-w-[250px] rounded-lg p-4 shadow-xl lg:block">
+            <div class="flex items-center gap-3">
+              <span class="icon-badge h-10 w-10"><iconify-icon icon="lucide:graduation-cap" width="22"></iconify-icon></span>
+              <p class="text-sm font-bold">Cocok untuk kebutuhan praktikum mahasiswa kesehatan.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="relative z-10 mx-auto -mt-16 max-w-6xl px-5 lg:px-8">
+        <div class="reveal grid gap-3 rounded-xl border border-ink/10 bg-white p-4 shadow-2xl shadow-ink/10 sm:grid-cols-2 lg:grid-cols-4">
+          <a href="#konsultasi" class="brand-card flex items-center gap-4 rounded-lg p-4 transition hover:-translate-y-0.5 hover:border-teal/30">
+            <span class="icon-badge h-12 w-12"><iconify-icon icon="lucide:graduation-cap" width="24"></iconify-icon></span>
+            <p><strong class="block text-2xl text-ink">B2C</strong><span class="text-xs font-semibold text-ink/55">Mahasiswa & tenaga kesehatan</span></p>
+          </a>
+          <a href="#konsultasi" class="brand-card flex items-center gap-4 rounded-lg p-4 transition hover:-translate-y-0.5 hover:border-teal/30">
+            <span class="icon-badge h-12 w-12"><iconify-icon icon="lucide:building-2" width="24"></iconify-icon></span>
+            <p><strong class="block text-2xl text-ink">B2B</strong><span class="text-xs font-semibold text-ink/55">Klinik & institusi</span></p>
+          </a>
+          <a href="#konsultasi" class="brand-card flex items-center gap-4 rounded-lg p-4 transition hover:-translate-y-0.5 hover:border-teal/30">
+            <span class="icon-badge h-12 w-12"><iconify-icon icon="lucide:package-check" width="24"></iconify-icon></span>
+            <p><strong class="block text-2xl text-ink">Set</strong><span class="text-xs font-semibold text-ink/55">Satuan dan paket instrumen</span></p>
+          </a>
+          <a href="#konsultasi" class="brand-card flex items-center gap-4 rounded-lg p-4 transition hover:-translate-y-0.5 hover:border-teal/30">
+            <span class="icon-badge h-12 w-12"><iconify-icon icon="lucide:message-circle" width="24"></iconify-icon></span>
+            <p><strong class="block text-2xl text-ink">WA</strong><span class="text-xs font-semibold text-ink/55">Konsultasi sebelum membeli</span></p>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section id="produk" class="bg-gradient-to-br from-[#DDEBFF] via-[#EEF8FF] to-[#E5F6EC] pb-20 pt-28">
+      <div class="mx-auto max-w-7xl px-5 lg:px-8">
+        <div class="reveal max-w-3xl">
+          <span class="text-xs font-bold uppercase tracking-[0.2em] text-teal">Kategori Produk</span>
+          <h2 class="mt-3 text-3xl font-extrabold uppercase leading-tight text-navy sm:text-5xl">Pilih alat kesehatan dengan lebih percaya diri</h2>
+          <div class="brand-divider mt-5 justify-start"><span></span></div>
+          <p class="mt-5 text-base leading-8 text-ink/65">Mulai dari kebutuhan praktikum, pemeriksaan, tindakan, hingga pengadaan institusi. SAIMED membantu Anda menemukan kategori produk yang relevan tanpa harus menebak-nebak nama alat.</p>
+        </div>
+        <div class="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <article class="category-card brand-card reveal rounded-lg p-6">
+            <span class="icon-badge h-16 w-16"><iconify-icon class="category-icon transition" icon="lucide:scissors" width="34"></iconify-icon></span>
+            <h3 class="mt-5 text-xl font-extrabold">Instrumen bedah</h3>
+            <p class="mt-3 text-sm leading-7 text-ink/65">Pilihan instrumen untuk mendukung kebutuhan tindakan dan pembelajaran klinis, mulai dari gunting, forceps, needle holder, hingga retractor.</p>
+          </article>
+          <article class="category-card brand-card reveal rounded-lg p-6">
+            <span class="icon-badge green h-16 w-16"><iconify-icon class="category-icon transition" icon="lucide:briefcase-medical" width="34"></iconify-icon></span>
+            <h3 class="mt-5 text-xl font-extrabold">Paket praktikum</h3>
+            <p class="mt-3 text-sm leading-7 text-ink/65">Solusi praktis untuk mahasiswa kesehatan yang sedang menyiapkan perlengkapan latihan keterampilan klinis.</p>
+          </article>
+          <article class="category-card brand-card reveal rounded-lg p-6">
+            <span class="icon-badge h-16 w-16"><iconify-icon class="category-icon transition" icon="lucide:heart-pulse" width="34"></iconify-icon></span>
+            <h3 class="mt-5 text-xl font-extrabold">Kebidanan & obgyn</h3>
+            <p class="mt-3 text-sm leading-7 text-ink/65">Instrumen pendukung untuk kebutuhan kebidanan dan kandungan dengan pilihan produk yang mudah dikonsultasikan.</p>
+          </article>
+          <article class="category-card brand-card reveal rounded-lg p-6">
+            <span class="icon-badge green h-16 w-16"><iconify-icon class="category-icon transition" icon="lucide:smile" width="34"></iconify-icon></span>
+            <h3 class="mt-5 text-xl font-extrabold">Kedokteran gigi</h3>
+            <p class="mt-3 text-sm leading-7 text-ink/65">Perlengkapan pemeriksaan dan tindakan gigi untuk kebutuhan praktikum, klinik, maupun profesional.</p>
+          </article>
+          <article class="category-card brand-card reveal rounded-lg p-6">
+            <span class="icon-badge h-16 w-16"><iconify-icon class="category-icon transition" icon="lucide:package-check" width="34"></iconify-icon></span>
+            <h3 class="mt-5 text-xl font-extrabold">Disposable & penunjang</h3>
+            <p class="mt-3 text-sm leading-7 text-ink/65">Produk penunjang untuk pemeriksaan, perawatan, dan kebutuhan operasional harian.</p>
+          </article>
+          <article class="category-card brand-card reveal rounded-lg p-6">
+            <span class="icon-badge green h-16 w-16"><iconify-icon class="category-icon transition" icon="lucide:archive" width="34"></iconify-icon></span>
+            <h3 class="mt-5 text-xl font-extrabold">Sterilisasi & penyimpanan</h3>
+            <p class="mt-3 text-sm leading-7 text-ink/65">Tray, box, bowl, drum, dan aksesori penyimpanan untuk menjaga instrumen lebih tertata.</p>
+          </article>
+        </div>
+        <div class="mt-14">
+          <div class="reveal max-w-3xl">
+            <span class="text-xs font-bold uppercase tracking-[0.2em] text-green">Best Seller</span>
+            <h3 class="mt-2 text-3xl font-extrabold uppercase leading-tight text-navy sm:text-4xl">Produk best seller utama</h3>
+            <p class="mt-4 text-sm leading-7 text-ink/65">Tiga produk populer dari katalog SAIMED yang sering dicari untuk kebutuhan dasar dan penunjang.</p>
+          </div>
+          <div id="bestSellerProducts" class="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-5"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="solusi" class="bg-gradient-to-br from-[#E5F6EC] via-[#EEF8FF] to-[#DDEBFF] py-20">
+      <div class="mx-auto grid max-w-7xl gap-10 px-5 lg:grid-cols-[.88fr_1.12fr] lg:px-8">
+        <div class="reveal">
+          <span class="text-xs font-bold uppercase tracking-[0.2em] text-teal">Untuk Siapa</span>
+          <h2 class="mt-3 text-3xl font-extrabold leading-tight sm:text-5xl">Satu penyedia untuk banyak kebutuhan medis.</h2>
+          <p class="mt-5 leading-8 text-ink/65">Baik Anda sedang menyiapkan praktikum, melengkapi ruang tindakan, atau menyusun kebutuhan pengadaan, SAIMED membantu proses pencarian produk menjadi lebih sederhana.</p>
+        </div>
+        <div class="grid gap-4 sm:grid-cols-3">
+          <div class="brand-card reveal rounded-lg p-6">
+            <span class="icon-badge h-12 w-12"><iconify-icon icon="lucide:book-open" width="24"></iconify-icon></span>
+            <h3 class="mt-5 font-extrabold">Mahasiswa</h3>
+            <p class="mt-3 text-sm leading-7 text-ink/65">Siapkan alat praktikum dengan lebih terarah, dari kit dasar hingga instrumen sesuai materi pembelajaran.</p>
+          </div>
+          <div class="brand-card reveal rounded-lg p-6">
+            <span class="icon-badge h-12 w-12"><iconify-icon icon="lucide:user-round-check" width="24"></iconify-icon></span>
+            <h3 class="mt-5 font-extrabold">Profesional</h3>
+            <p class="mt-3 text-sm leading-7 text-ink/65">Temukan instrumen berdasarkan bentuk, ukuran, dan kebutuhan pemeriksaan atau tindakan.</p>
+          </div>
+          <div class="brand-card reveal rounded-lg p-6">
+            <span class="icon-badge h-12 w-12"><iconify-icon icon="lucide:building-2" width="24"></iconify-icon></span>
+            <h3 class="mt-5 font-extrabold">Institusi</h3>
+            <p class="mt-3 text-sm leading-7 text-ink/65">Dapatkan bantuan menyusun kebutuhan produk untuk klinik, laboratorium keterampilan, atau pembelian terencana.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="bg-gradient-to-br from-[#DDEBFF] via-[#E5F6EC] to-[#EEF8FF] py-20">
+      <div class="mx-auto max-w-7xl px-5 lg:px-8">
+        <div class="reveal text-center">
+          <span class="text-xs font-bold uppercase tracking-[0.2em] text-teal">Kenapa SAIMED</span>
+          <h2 class="mx-auto mt-3 max-w-3xl text-3xl font-extrabold leading-tight sm:text-5xl">Belanja alat kesehatan seharusnya jelas sejak awal.</h2>
+          <p class="mx-auto mt-5 max-w-2xl font-body text-base leading-8 text-ink/65">Kami membantu Anda memahami pilihan produk, menyesuaikan kebutuhan, dan melanjutkan pemesanan lewat kanal yang praktis.</p>
+        </div>
+        <div class="mt-12 grid gap-4 md:grid-cols-3">
+          <article class="brand-card reveal rounded-lg p-6">
+            <span class="icon-badge h-12 w-12"><iconify-icon icon="lucide:book-marked" width="24"></iconify-icon></span>
+            <h3 class="mt-5 text-lg font-extrabold">Informasi mudah dipahami</h3>
+            <p class="mt-3 font-body text-sm leading-7 text-ink/65">Nama alat medis bisa terasa teknis. SAIMED membantu menjelaskan pilihan produk dengan bahasa yang lebih sederhana.</p>
+          </article>
+          <article class="brand-card reveal rounded-lg p-6">
+            <span class="icon-badge h-12 w-12"><iconify-icon icon="lucide:scan-search" width="24"></iconify-icon></span>
+            <h3 class="mt-5 text-lg font-extrabold">Pilihan produk luas</h3>
+            <p class="mt-3 font-body text-sm leading-7 text-ink/65">Dari instrumen satuan hingga paket perlengkapan, Anda bisa mencari kebutuhan dari satu penyedia.</p>
+          </article>
+          <article class="brand-card reveal rounded-lg p-6">
+            <span class="icon-badge h-12 w-12"><iconify-icon icon="lucide:badge-check" width="24"></iconify-icon></span>
+            <h3 class="mt-5 text-lg font-extrabold">Konsultasi sebelum pesan</h3>
+            <p class="mt-3 font-body text-sm leading-7 text-ink/65">Tanyakan kategori, ukuran, jumlah, atau kebutuhan khusus sebelum Anda melanjutkan pembelian.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="b2b" class="saimed-band py-20 text-white">
+      <div class="mx-auto grid max-w-7xl items-center gap-10 px-5 lg:grid-cols-2 lg:px-8">
+        <div class="reveal">
+          <span class="text-xs font-bold uppercase tracking-[0.2em] text-mint">Untuk Klinik & Institusi</span>
+          <h2 class="mt-3 text-3xl font-extrabold leading-tight sm:text-5xl">Pengadaan alat kesehatan jadi lebih praktis dalam satu layanan.</h2>
+          <p class="mt-5 leading-8 text-white/70">SAIMED membantu klinik, perusahaan, dan institusi pendidikan mencari produk yang sesuai kebutuhan operasional, praktikum, atau pembelian rutin.</p>
+        </div>
+        <div class="reveal rounded-xl border border-white/20 bg-white/15 p-6 shadow-2xl shadow-blue-900/20 backdrop-blur">
+          <div class="grid gap-4">
+            <div class="flex gap-4 rounded-md bg-white/8 p-4">
+              <iconify-icon icon="lucide:list-checks" width="24" class="text-mint"></iconify-icon>
+              <p class="text-sm leading-7 text-white/75">Pilihan produk untuk ruang tindakan, laboratorium keterampilan, klinik, dan kebutuhan pendidikan.</p>
+            </div>
+            <div class="flex gap-4 rounded-md bg-white/8 p-4">
+              <iconify-icon icon="lucide:message-square-text" width="24" class="text-mint"></iconify-icon>
+              <p class="text-sm leading-7 text-white/75">Tim SAIMED membantu memperjelas kategori, variasi, dan jumlah kebutuhan sebelum pemesanan.</p>
+            </div>
+            <div class="flex gap-4 rounded-md bg-white/8 p-4">
+              <iconify-icon icon="lucide:clipboard-check" width="24" class="text-mint"></iconify-icon>
+              <p class="text-sm leading-7 text-white/75">Pembelian dapat diarahkan melalui WhatsApp untuk konsultasi dan Shopee untuk transaksi ritel.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="bg-gradient-to-br from-[#E5F6EC] via-[#EEF8FF] to-[#DDEBFF] py-20">
+      <div class="mx-auto max-w-7xl px-5 lg:px-8">
+        <div class="reveal text-center">
+          <span class="text-xs font-bold uppercase tracking-[0.2em] text-teal">Alur Konsultasi</span>
+          <h2 class="mx-auto mt-3 max-w-3xl text-3xl font-extrabold leading-tight sm:text-5xl">Dari pertanyaan pertama sampai produk siap dipesan.</h2>
+        </div>
+        <div class="mt-12 grid gap-4 md:grid-cols-4">
+          <div class="reveal rounded-lg border border-ink/10 p-6">
+            <span class="text-sm font-extrabold text-teal">01</span>
+            <h3 class="mt-4 font-extrabold">Pilih kebutuhan</h3>
+            <p class="mt-3 text-sm leading-7 text-ink/65">Ceritakan apakah produk dibutuhkan untuk praktikum, klinik, rumah, atau institusi.</p>
+          </div>
+          <div class="reveal rounded-lg border border-ink/10 p-6">
+            <span class="text-sm font-extrabold text-teal">02</span>
+            <h3 class="mt-4 font-extrabold">Sebutkan kategori</h3>
+            <p class="mt-3 text-sm leading-7 text-ink/65">Sebutkan alat yang dicari, misalnya suturing kit, forceps, speculum, dental set, atau disposable.</p>
+          </div>
+          <div class="reveal rounded-lg border border-ink/10 p-6">
+            <span class="text-sm font-extrabold text-teal">03</span>
+            <h3 class="mt-4 font-extrabold">Cek variasi</h3>
+            <p class="mt-3 text-sm leading-7 text-ink/65">Pastikan pilihan produk, ukuran, jumlah, dan detail yang perlu disesuaikan.</p>
+          </div>
+          <div class="reveal rounded-lg border border-ink/10 p-6">
+            <span class="text-sm font-extrabold text-teal">04</span>
+            <h3 class="mt-4 font-extrabold">Lanjut transaksi</h3>
+            <p class="mt-3 text-sm leading-7 text-ink/65">Lanjutkan pemesanan melalui WhatsApp atau Shopee sesuai kebutuhan Anda.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq" class="bg-gradient-to-br from-[#DDEBFF] via-[#EEF8FF] to-[#E5F6EC] py-20">
+      <div class="mx-auto grid max-w-7xl gap-10 px-5 lg:grid-cols-[.8fr_1.2fr] lg:px-8">
+        <div class="reveal">
+          <span class="text-xs font-bold uppercase tracking-[0.2em] text-teal">FAQ</span>
+          <h2 class="mt-3 text-3xl font-extrabold leading-tight sm:text-5xl">Jawaban singkat sebelum Anda membeli.</h2>
+        </div>
+        <div class="reveal divide-y divide-ink/10 rounded-lg bg-white/70 shadow-lg shadow-ink/5">
+          <details class="group p-6" open>
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-extrabold">
+              Apakah SAIMED hanya untuk tenaga medis?
+              <iconify-icon icon="lucide:chevron-down" class="transition group-open:rotate-180"></iconify-icon>
+            </summary>
+            <p class="mt-4 text-sm leading-7 text-ink/65">Tidak. SAIMED melayani mahasiswa kesehatan, tenaga kesehatan, klinik, institusi pendidikan, perusahaan, dan pelanggan umum yang membutuhkan perlengkapan kesehatan tertentu.</p>
+          </details>
+          <details class="group p-6">
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-extrabold">
+              Bagaimana cara memastikan produk yang saya pilih sudah sesuai?
+              <iconify-icon icon="lucide:chevron-down" class="transition group-open:rotate-180"></iconify-icon>
+            </summary>
+            <p class="mt-4 text-sm leading-7 text-ink/65">Kirimkan kebutuhan, nama alat, atau contoh produk melalui WhatsApp. Tim SAIMED akan membantu mengecek pilihan yang paling relevan dengan kebutuhan Anda.</p>
+          </details>
+          <details class="group p-6">
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-extrabold">
+              Bisa konsultasi sebelum membeli?
+              <iconify-icon icon="lucide:chevron-down" class="transition group-open:rotate-180"></iconify-icon>
+            </summary>
+            <p class="mt-4 text-sm leading-7 text-ink/65">Bisa. Konsultasi membantu memperjelas kategori, variasi ukuran, jumlah, dan kebutuhan produk sebelum Anda melanjutkan pemesanan.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section id="konsultasi" class="bg-gradient-to-br from-[#E5F6EC] via-[#EEF8FF] to-[#DDEBFF] py-20">
+      <div class="mx-auto grid max-w-7xl gap-10 px-5 lg:grid-cols-[.9fr_1.1fr] lg:px-8">
+        <div class="reveal">
+          <span class="text-xs font-bold uppercase tracking-[0.2em] text-teal">Konsultasi</span>
+          <h2 class="mt-3 text-3xl font-extrabold leading-tight sm:text-5xl">Butuh bantuan memilih alat kesehatan?</h2>
+          <p class="mt-5 leading-8 text-ink/65">Isi kebutuhan Anda, lalu lanjutkan konsultasi ke WhatsApp SAIMED. Lebih cepat, lebih jelas, dan lebih mudah ditindaklanjuti.</p>
+          <div class="mt-7 flex flex-wrap gap-3">
+            <a id="shopeeLink" href="#konsultasi" class="inline-flex items-center gap-2 rounded-md border border-ink/15 px-4 py-3 text-sm font-bold text-ink hover:border-teal hover:text-teal">
+              <iconify-icon icon="lucide:shopping-bag" width="18"></iconify-icon>
+              Konsultasi Produk
+            </a>
+          </div>
+        </div>
+        <form id="waForm" class="reveal rounded-lg border border-ink/10 bg-[#F7FAFA] p-6 shadow-xl shadow-ink/5">
+          <div class="grid gap-4 sm:grid-cols-2">
+            <label class="grid gap-2 text-sm font-bold">Nama
+              <input id="name" required class="rounded-md border border-ink/15 bg-white px-4 py-3 font-medium outline-none focus:border-teal" placeholder="Nama Anda" />
+            </label>
+            <label class="grid gap-2 text-sm font-bold">Kebutuhan
+              <select id="need" class="rounded-md border border-ink/15 bg-white px-4 py-3 font-medium outline-none focus:border-teal">
+                <option>Praktikum mahasiswa</option>
+                <option>Tenaga kesehatan / praktik</option>
+                <option>Klinik / institusi</option>
+                <option>Pengadaan B2B</option>
+                <option>Lainnya</option>
+              </select>
+            </label>
+          </div>
+          <label class="mt-4 grid gap-2 text-sm font-bold">Kategori produk
+            <input id="category" class="rounded-md border border-ink/15 bg-white px-4 py-3 font-medium outline-none focus:border-teal" placeholder="Contoh: suturing kit, forceps, dental mirror" />
+          </label>
+          <label class="mt-4 grid gap-2 text-sm font-bold">Detail pertanyaan
+            <textarea id="message" rows="5" class="resize-none rounded-md border border-ink/15 bg-white px-4 py-3 font-medium outline-none focus:border-teal" placeholder="Tulis ukuran, jumlah, atau kebutuhan khusus yang ingin dicek."></textarea>
+          </label>
+          <button class="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-md bg-teal px-5 py-3.5 text-sm font-extrabold text-white shadow-xl shadow-teal/20 transition hover:bg-green">
+            Kirim ke WhatsApp
+            <iconify-icon icon="lucide:send" width="18"></iconify-icon>
+          </button>
+          <p class="mt-3 text-xs leading-6 text-ink/50">Tim SAIMED akan membantu memberikan informasi produk sesuai detail yang Anda kirimkan.</p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="saimed-band px-5 py-10 text-white">
+      <div class="mx-auto grid max-w-7xl gap-8 md:grid-cols-[1.2fr_.9fr_.6fr] md:items-start lg:px-8">
+        <div>
+          <strong class="text-xl tracking-[0.08em]">SAIMED</strong>
+          <p class="mt-2 max-w-xl text-sm leading-7 text-white/60">Sentra Alkes Indonesia - penyedia alat kesehatan dan instrumen medis dengan pendekatan profesional, edukatif, dan berorientasi solusi.</p>
+        </div>
+        <div>
+          <h3 class="text-sm font-extrabold uppercase tracking-[0.18em] text-white/70">Kontak</h3>
+          <ul class="mt-4 grid gap-3 text-sm font-semibold text-white/90">
+            <li><a href="https://wa.me/6285189890015" target="_blank" rel="noopener" class="grid grid-cols-[22px_1fr] items-center gap-3 hover:text-white"><iconify-icon icon="lucide:phone" width="18"></iconify-icon><span>+62 851-8989-0015</span></a></li>
+            <li><span class="grid grid-cols-[22px_1fr] items-center gap-3"><iconify-icon icon="lucide:instagram" width="18"></iconify-icon><span>sentraalkesindonesia</span></span></li>
+            <li><a href="mailto:sentraalkes.id@gmail.com" class="grid grid-cols-[22px_1fr] items-center gap-3 hover:text-white"><iconify-icon icon="lucide:mail" width="18"></iconify-icon><span>sentraalkes.id@gmail.com</span></a></li>
+          </ul>
+        </div>
+        <p class="text-xs leading-6 text-white/45 md:text-right">&copy; 2026 SAIMED.<br>All rights reserved.</p>
+      </div>
+  </footer>
+
+  <div id="productModal" class="fixed inset-0 z-[70] hidden items-center justify-center bg-ink/55 p-5 backdrop-blur-sm">
+    <div class="w-full max-w-xl overflow-hidden rounded-xl bg-white shadow-2xl">
+      <div class="flex items-center justify-between border-b border-ink/10 p-4">
+        <strong id="modalProductTitle" class="text-lg font-extrabold text-navy">Produk SAIMED</strong>
+        <button id="closeProductModal" class="grid h-10 w-10 place-items-center rounded-full bg-[#E5F6EC] text-green" aria-label="Tutup gambar produk">
+          <iconify-icon icon="lucide:x" width="20"></iconify-icon>
+        </button>
+      </div>
+      <img id="modalProductImage" src="" alt="" class="max-h-[70vh] w-full object-contain bg-[#EEF6FF]" />
+    </div>
+  </div>
+
+  <a id="floatingWa" href="https://wa.me/6285189890015" target="_blank" rel="noopener" class="fixed bottom-5 right-5 z-40 grid h-14 w-14 place-items-center rounded-full bg-green text-white shadow-2xl shadow-teal/30 transition hover:bg-teal" aria-label="Konsultasi WhatsApp">
+    <iconify-icon icon="lucide:message-circle" width="26"></iconify-icon>
+  </a>
+
+  <script>
+    const SAIMED_CONFIG = {
+      whatsappNumber: '6285189890015',
+      shopeeUrl: '#konsultasi'
+    };
+
+    const menuButton = document.getElementById('menuButton');
+    const mobileMenu = document.getElementById('mobileMenu');
+    menuButton?.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+    mobileMenu?.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', () => mobileMenu.classList.add('hidden'));
+    });
+
+    const bestSellers = [
+      { name: 'Standart Tissue Forcep', image: 'assets/bestseller-tissue-forcep.png', variants: 'Sedang / anatomis' },
+      { name: 'Standart Dressing Forcep', image: 'assets/bestseller-dressing-forcep.png', variants: 'Sedang / anatomis' },
+      { name: 'Syringe Luer Lock with Needle', image: 'assets/bestseller-syringe.png', variants: '1 ml, 3 ml, 5 ml, 10 ml, 20 ml, 50 ml' }
+    ];
+
+    const bestSellerProducts = document.getElementById('bestSellerProducts');
+    const productModal = document.getElementById('productModal');
+    const modalProductTitle = document.getElementById('modalProductTitle');
+    const modalProductImage = document.getElementById('modalProductImage');
+
+    function productCard(product, index, isBestSeller = false) {
+      const name = product.name;
+      const image = product.image;
+      const variants = product.variants;
+      const label = String(index + 1).padStart(2, '0');
+      return `
+        <button type="button" class="product-card text-left rounded-lg transition hover:-translate-y-0.5 hover:border-green/40" data-product="${name}" data-image="${image}">
+          <img src="${image}" alt="${name}">
+          <span class="block p-4">
+            <span class="product-rank mb-3 grid h-8 w-8 place-items-center rounded-full text-xs font-extrabold text-white">${label}</span>
+            <strong class="block text-sm font-extrabold text-navy">${name}</strong>
+            <small class="mt-1 block text-xs font-semibold text-ink/50">${isBestSeller ? 'Best seller' : variants}</small>
+          </span>
+        </button>`;
+    }
+
+    bestSellerProducts.innerHTML = bestSellers.map((item, index) => productCard(item, index, true)).join('');
+
+    document.addEventListener('click', (event) => {
+      const productButton = event.target.closest('.product-card');
+      if (!productButton) return;
+      modalProductTitle.textContent = productButton.dataset.product;
+      modalProductImage.src = productButton.dataset.image;
+      modalProductImage.alt = productButton.dataset.product;
+      productModal.classList.remove('hidden');
+      productModal.classList.add('flex');
+    });
+    document.getElementById('closeProductModal').addEventListener('click', () => {
+      productModal.classList.add('hidden');
+      productModal.classList.remove('flex');
+    });
+    productModal.addEventListener('click', (event) => {
+      if (event.target === productModal) {
+        productModal.classList.add('hidden');
+        productModal.classList.remove('flex');
+      }
+    });
+
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach((item) => revealObserver.observe(item));
+
+    const shopeeLink = document.getElementById('shopeeLink');
+    if (SAIMED_CONFIG.shopeeUrl) shopeeLink.href = SAIMED_CONFIG.shopeeUrl;
+
+    document.getElementById('waForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const name = document.getElementById('name').value.trim();
+      const need = document.getElementById('need').value;
+      const category = document.getElementById('category').value.trim() || '-';
+      const detail = document.getElementById('message').value.trim() || '-';
+      const text = [
+        'Halo SAIMED, saya ingin konsultasi produk.',
+        '',
+        `Nama: ${name}`,
+        `Kebutuhan: ${need}`,
+        `Kategori produk: ${category}`,
+        `Detail pertanyaan: ${detail}`
+      ].join('\n');
+
+      if (!SAIMED_CONFIG.whatsappNumber) {
+        alert('Nomor WhatsApp SAIMED belum tersedia. Silakan hubungi SAIMED melalui kanal kontak resmi.');
+        return;
+      }
+      window.open(`https://wa.me/${SAIMED_CONFIG.whatsappNumber}?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
+    });
+  </script>
+</body>
+</html>
